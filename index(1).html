@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Habitat Loss &amp; Restoration</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f5f4f0;
+  color: #1a1a18;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e0dfd8;
+  padding: 2rem;
+}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.title { font-size: 24px; font-weight: 600; color: #1a1a18; }
+.sub { font-size: 13px; color: #6b6b68; margin-top: 4px; margin-bottom: 1.5rem; }
+.stats { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+.sc { background: #f5f4f0; border-radius: 8px; padding: .65rem 1rem; min-width: 90px; }
+.sl { font-size: 11px; color: #6b6b68; }
+.sv { font-size: 20px; font-weight: 600; color: #1a1a18; margin-top: 2px; }
+.progress { display: flex; gap: 6px; margin-bottom: 1.25rem; align-items: center; }
+.pip { width: 28px; height: 4px; border-radius: 2px; background: #c8c7c0; transition: background .3s; }
+.pip.done { background: #3b6d11; }
+.pip.active { background: #97c459; }
+.rl { font-size: 13px; font-weight: 600; color: #6b6b68; margin-bottom: .5rem; }
+.instr { font-size: 13px; color: #6b6b68; margin-bottom: 1rem; padding: .65rem 1rem; border: 1px solid #e0dfd8; border-radius: 8px; background: #f5f4f0; line-height: 1.6; }
+.instr b { color: #1a1a18; }
+.pool-lbl { font-size: 11px; color: #6b6b68; margin-bottom: .4rem; }
+.pool { display: flex; flex-wrap: wrap; gap: 9px; min-height: 56px; margin-bottom: 1.5rem; padding: 10px; border: 2px dashed #c8c7c0; border-radius: 12px; }
+.oc { cursor: grab; padding: 7px 13px; border-radius: 8px; border: 1px solid #c8c7c0; background: #fff; font-size: 13px; font-weight: 600; color: #1a1a18; user-select: none; transition: transform .12s, opacity .12s; display: flex; align-items: center; gap: 6px; }
+.oc:active { cursor: grabbing; transform: scale(1.04); }
+.oc.dragging { opacity: .35; }
+.oc.placed { display: none; }
+.zones { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 11px; margin-bottom: 1.5rem; }
+.zone { border-radius: 12px; border: 1.5px solid #e0dfd8; background: #fff; padding: 11px; min-height: 130px; transition: border-color .15s, background .15s; }
+.zone.over { border-color: #378add; background: #e6f1fb; }
+.zt { font-size: 13px; font-weight: 600; color: #1a1a18; margin-bottom: 3px; }
+.zh { font-size: 11px; color: #6b6b68; margin-bottom: 9px; line-height: 1.4; }
+.zc { display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; }
+.zcard { padding: 4px 9px; border-radius: 6px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.zcard.correct { background: #eaf3de; color: #3b6d11; border: 1px solid #97c459; }
+.zcard.wrong { background: #fcebeb; color: #a32d2d; border: 1px solid #f09595; animation: shk .35s; }
+@keyframes shk { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+.fb { min-height: 46px; padding: 9px 13px; border-radius: 8px; font-size: 13px; margin-bottom: 1rem; border: 1px solid #e0dfd8; background: #f5f4f0; color: #6b6b68; line-height: 1.5; transition: all .2s; }
+.fb.ok { background: #eaf3de; border-color: #97c459; color: #3b6d11; }
+.fb.err { background: #fcebeb; border-color: #f09595; color: #a32d2d; }
+.btn { padding: 8px 20px; border-radius: 8px; border: 1px solid #c8c7c0; background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: #1a1a18; transition: background .1s, transform .1s; }
+.btn:hover { background: #f5f4f0; }
+.btn:active { transform: scale(.98); }
+.btn-p { background: #eaf3de; color: #3b6d11; border-color: #97c459; }
+.btn-p:hover { background: #c0dd97; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; margin-left: 6px; background: #f5f4f0; color: #6b6b68; border: 1px solid #e0dfd8; }
+.end { text-align: center; padding: 2.5rem 1rem; }
+.ei { font-size: 52px; margin-bottom: 1rem; }
+.et { font-size: 24px; font-weight: 600; margin-bottom: .5rem; }
+.es { font-size: 14px; color: #6b6b68; margin-bottom: 1rem; }
+.ebig { font-size: 52px; font-weight: 700; color: #3b6d11; }
+.emeta { font-size: 13px; color: #6b6b68; margin: .5rem 0 1.5rem; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="sr-only">Habitat Loss and Restoration — a 4-round conservation sorting game</h1>
+  <div id="game"></div>
+</div>
+<script>
+const ROUNDS = [
+  {
+    title: "Round 1 — Causes of habitat loss",
+    instr: "<b>Drag</b> each scenario into the category of habitat loss it best represents. Understanding the cause is the first step to conservation.",
+    zones: [
+      { id: "agri",      label: "Agricultural expansion", badge: "Conversion to farmland",   hint: "Natural land cleared to grow crops or raise livestock" },
+      { id: "urban",     label: "Urban development",       badge: "Sprawl & infrastructure",  hint: "Habitat replaced by roads, buildings and cities" },
+      { id: "logging",   label: "Logging & extraction",    badge: "Resource removal",          hint: "Trees or resources removed, degrading ecosystem structure" },
+      { id: "pollution", label: "Pollution & degradation", badge: "Quality loss",              hint: "Habitat remains but becomes too toxic or altered to support wildlife" },
+    ],
+    cards: [
+      { id: "palm",     label: "Palm oil plantation",     icon: "🌴", correct: "agri",      fb: { r: "Correct! Palm oil plantations have replaced over 3.5 million hectares of Southeast Asian rainforest — the leading cause of orangutan habitat loss.", w: "Palm oil plantations are agricultural expansion — rainforest is cleared and permanently converted to monoculture farmland." } },
+      { id: "soy",      label: "Soy farming in Cerrado",  icon: "🌱", correct: "agri",      fb: { r: "Right! Brazil's Cerrado savanna has lost over 50% of its native vegetation to soy farming, driven largely by global meat demand.", w: "Soy farming is agricultural expansion — the Cerrado is one of the world's most biodiverse savannas, being converted to grow animal feed." } },
+      { id: "freeway",  label: "Freeway construction",    icon: "🛣️", correct: "urban",     fb: { r: "Correct! Freeways fragment habitats and create lethal barriers — mountain lions in LA must cross 8-lane highways to find mates.", w: "Freeway construction is urban development — roads physically sever habitats and isolate wildlife populations from each other." } },
+      { id: "suburb",   label: "Suburban sprawl",         icon: "🏘️", correct: "urban",     fb: { r: "Right! Suburban sprawl is one of the fastest drivers of wetland and grassland loss in North America, replacing diverse ecosystems with pavement.", w: "Suburban sprawl is urban development — it permanently converts natural land to low-density housing, fragmenting surrounding habitat." } },
+      { id: "clearcut", label: "Clearcut logging",        icon: "🪓", correct: "logging",   fb: { r: "Correct! Clearcutting removes entire forest stands, destroying habitat structure, soil integrity and the biodiversity that depends on mature trees.", w: "Clearcut logging is resource extraction — it removes all trees at once, eliminating the complex habitat structure wildlife depends on." } },
+      { id: "mining",   label: "Open-pit mining",         icon: "⛏️", correct: "logging",   fb: { r: "Right! Open-pit mining strips entire landscapes, displacing species and contaminating waterways long after the mine closes.", w: "Open-pit mining is extraction — it removes land wholesale, destroying habitat and generating toxic runoff that persists for decades." } },
+      { id: "runoff",   label: "Agricultural runoff",     icon: "💧", correct: "pollution", fb: { r: "Correct! Fertiliser and pesticide runoff creates hypoxic dead zones — the Gulf of Mexico dead zone covers over 6,000 sq miles.", w: "Agricultural runoff is pollution degradation — the physical habitat remains but chemical pollution makes it uninhabitable for most species." } },
+      { id: "plastic",  label: "Plastic in wetlands",     icon: "🧴", correct: "pollution", fb: { r: "Right! Microplastics in wetlands disrupt feeding, reproduction and water quality without physically removing the habitat.", w: "Plastic pollution degrades habitat quality — the wetland still exists but becomes a sink for toxins that harm species from invertebrates to wading birds." } },
+    ]
+  },
+  {
+    title: "Round 2 — Fragmentation effects",
+    instr: "Habitat fragmentation breaks continuous landscapes into isolated patches. <b>Match</b> each ecological consequence to its correct fragmentation effect.",
+    zones: [
+      { id: "edge",     label: "Edge effect",           badge: "Boundary dynamics",     hint: "Changes at the border between habitat patches" },
+      { id: "island",   label: "Habitat island effect",  badge: "Isolation & area",      hint: "Small isolated patches support fewer species" },
+      { id: "corridor", label: "Loss of connectivity",   badge: "Movement blocked",      hint: "Species can no longer move between patches" },
+      { id: "inbreed",  label: "Genetic isolation",      badge: "Small population risk", hint: "Isolated populations lose genetic diversity" },
+    ],
+    cards: [
+      { id: "deer_tick",       label: "Deer tick outbreak",               icon: "🦟", correct: "edge",     fb: { r: "Correct! Edge habitat increases deer and tick encounters with humans — Lyme disease rates are highest near fragmented forests with abundant edge.", w: "Tick outbreaks are an edge effect — deer and ticks thrive in the brushy zone between forest and suburb, increasing disease risk." } },
+      { id: "cowbird",         label: "Cowbird nest parasitism",          icon: "🐦", correct: "edge",     fb: { r: "Right! Brown-headed cowbirds are edge specialists that parasitise forest interior nests — fragmentation exposes more nests to cowbird intrusion.", w: "Cowbird parasitism is an edge effect — cowbirds penetrate deeper into forest interiors as fragmentation increases the edge-to-interior ratio." } },
+      { id: "species_loss",    label: "Local species extinctions",        icon: "💀", correct: "island",   fb: { r: "Correct! Island biogeography theory predicts that smaller, more isolated patches hold fewer species and lose them faster after fragmentation.", w: "Local extinctions are the habitat island effect — smaller patches cannot sustain minimum viable populations of area-sensitive species." } },
+      { id: "no_bear",         label: "Bears absent from small reserves", icon: "🐻", correct: "island",   fb: { r: "Right! Large carnivores like grizzly bears need vast home ranges — small fragmented reserves cannot support them, leading to local extinction.", w: "Bear absence is the island effect — large-bodied species with big home ranges are the first to disappear from isolated habitat patches." } },
+      { id: "puma",            label: "Mountain lion road mortality",     icon: "🦁", correct: "corridor", fb: { r: "Correct! Southern California mountain lions are killed crossing freeways between fragmented patches — a direct cost of lost connectivity.", w: "Puma road deaths result from lost connectivity — without wildlife corridors, lions must cross deadly highways to reach mates and new territories." } },
+      { id: "salmon",          label: "Salmon blocked by dams",           icon: "🐟", correct: "corridor", fb: { r: "Right! Dams sever migratory corridors salmon have used for millennia, preventing spawning and collapsing fish and predator populations downstream.", w: "Salmon blockage is a connectivity loss — dams act as absolute barriers, cutting off the migratory routes essential for salmon reproduction." } },
+      { id: "florida_panther", label: "Florida panther inbreeding",       icon: "🐆", correct: "inbreed",  fb: { r: "Correct! By the 1990s Florida panthers had severe genetic defects from inbreeding — rescued only by introducing Texas puma individuals.", w: "Florida panther inbreeding is genetic isolation — a tiny isolated population lost diversity rapidly, causing physical defects until genetic rescue was performed." } },
+      { id: "isle_royale",     label: "Isle Royale wolf collapse",         icon: "🐺", correct: "inbreed",  fb: { r: "Right! The island wolf population shrank to two inbred individuals by 2016 — a textbook case of genetic isolation causing total collapse.", w: "Isle Royale wolves suffered genetic isolation — cut off by Lake Superior, the population inbred to near-extinction before a managed genetic rescue was launched." } },
+    ]
+  },
+  {
+    title: "Round 3 — Restoration strategies",
+    instr: "Conservation biologists use targeted strategies to restore damaged habitats. <b>Match</b> each action to its restoration approach.",
+    zones: [
+      { id: "rewild",    label: "Rewilding",                 badge: "Restore natural processes", hint: "Reintroducing species and letting ecosystems self-regulate" },
+      { id: "corridor2", label: "Corridor creation",          badge: "Reconnect patches",         hint: "Linking isolated habitat fragments to restore movement" },
+      { id: "active",    label: "Active restoration",         badge: "Direct intervention",        hint: "Hands-on planting, clearing invasives, rebuilding structure" },
+      { id: "policy",    label: "Legal protection",           badge: "Prevent further loss",       hint: "Legislation and designation that stops habitat destruction" },
+    ],
+    cards: [
+      { id: "wolf_restore",    label: "Wolf reintroduction, Yellowstone",   icon: "🐺", correct: "rewild",    fb: { r: "Correct! Reintroducing wolves to Yellowstone in 1995 triggered a trophic cascade — elk behaviour changed, rivers stabilised, and songbird populations recovered.", w: "Wolf reintroduction is rewilding — returning a keystone predator restores top-down ecological processes rather than managing every species individually." } },
+      { id: "beaver",          label: "Beaver reintroduction, UK rivers",   icon: "🦫", correct: "rewild",    fb: { r: "Right! Reintroduced beavers in Devon and Scotland have rebuilt wetlands, reduced flood risk and increased aquatic biodiversity — without human engineering.", w: "Beaver reintroduction is rewilding — beavers are ecosystem engineers whose dams naturally restore wetland habitat, water retention and species diversity." } },
+      { id: "y2y",             label: "Yellowstone to Yukon corridor",      icon: "🏔️", correct: "corridor2", fb: { r: "Correct! The Y2Y initiative links protected areas across 3,200 km so grizzlies, wolves and elk can move freely as the climate shifts.", w: "The Y2Y corridor is a connectivity project — it stitches protected areas across international borders for wide-ranging species." } },
+      { id: "wildlife_bridge", label: "Wildlife overpasses, Netherlands",   icon: "🌉", correct: "corridor2", fb: { r: "Right! The Netherlands has over 600 wildlife crossings — ecoducts covered in native vegetation allowing badgers, deer and roe to cross motorways safely.", w: "Wildlife overpasses create corridors — built structures that restore connectivity across roads, allowing safe movement between isolated habitat patches." } },
+      { id: "kelp_restore",    label: "Kelp forest replanting, California", icon: "🌿", correct: "active",    fb: { r: "Correct! Conservation teams hand-plant kelp and remove invasive urchins to restore forests sheltering hundreds of species along the California coast.", w: "Kelp replanting is active restoration — divers physically remove urchins and transplant kelp juveniles because the ecosystem cannot recover without direct help." } },
+      { id: "prairie_burn",    label: "Prescribed burns, tallgrass prairie",icon: "🔥", correct: "active",    fb: { r: "Right! Controlled burns mimic natural fire cycles tallgrass prairie depends on — suppressing woody invasion and releasing nutrients to restore native grasses.", w: "Prescribed burns are active restoration — without managed fire, woody shrubs smother the native prairie grasses that hundreds of species depend on." } },
+      { id: "esa",             label: "Endangered Species Act",             icon: "📋", correct: "policy",    fb: { r: "Correct! The US Endangered Species Act has prevented the extinction of 99% of species listed since 1973, including bald eagles and grey wolves.", w: "The ESA is legal protection — it designates critical habitat and prohibits harmful activities, preventing further destruction by law." } },
+      { id: "30x30",           label: "30×30 global pledge",                icon: "🌍", correct: "policy",    fb: { r: "Right! The 30×30 agreement commits nations to protect 30% of land and ocean by 2030 — the most ambitious international habitat protection target ever set.", w: "30×30 is legal protection — it commits governments to designate and enforce protection of 30% of Earth's land and seas within this decade." } },
+    ]
+  },
+  {
+    title: "Round 4 — Organizations, protected areas & human dimensions",
+    instr: "Conservation involves real institutions, protected areas, and complex human tradeoffs. <b>Sort</b> each scenario into its correct category.",
+    zones: [
+      { id: "org",       label: "Conservation organization", badge: "Who leads the work",    hint: "International or national bodies driving conservation action" },
+      { id: "protected", label: "Protected area type",        badge: "Where habitat is secured", hint: "Designated land or sea zones with legal habitat protection" },
+      { id: "socio",     label: "Socioeconomic conflict",     badge: "People vs. habitat",    hint: "Cases where human livelihoods clash with conservation goals" },
+      { id: "success",   label: "Conservation success story", badge: "Progress made",         hint: "Species or habitats with measurable recovery due to conservation" },
+    ],
+    cards: [
+      { id: "iucn",            label: "IUCN Red List program",              icon: "📊", correct: "org",       fb: { r: "Correct! The IUCN maintains the Red List — the world's most comprehensive inventory of species' extinction risk, used to prioritise conservation globally.", w: "The IUCN Red List is a conservation organization initiative — it classifies species by extinction risk and sets the global standard for conservation prioritization." } },
+      { id: "wwf",             label: "WWF habitat partnerships",           icon: "🐼", correct: "org",       fb: { r: "Right! WWF partners with governments and communities to protect critical habitats worldwide, from Amazon rainforest to Arctic sea ice.", w: "WWF is a conservation organization — it funds and coordinates habitat protection projects globally, working with local partners to reduce deforestation and degradation." } },
+      { id: "national_park",   label: "National Park designation",          icon: "🏞️", correct: "protected", fb: { r: "Correct! National Parks legally prevent extractive uses and preserve large tracts of habitat for wildlife and ecosystem services.", w: "National Parks are a protected area type — they designate land under government protection, restricting development and extractive activities that cause habitat loss." } },
+      { id: "ramsar",          label: "Ramsar Wetland site",                icon: "🦢", correct: "protected", fb: { r: "Right! Ramsar sites are internationally recognised wetlands of critical importance — over 2,400 sites covering 254 million hectares are protected under the Ramsar Convention.", w: "Ramsar sites are a protected area type — they provide legal international recognition and protection for wetlands of global ecological significance." } },
+      { id: "bushmeat",        label: "Bushmeat hunting near reserves",     icon: "🍖", correct: "socio",     fb: { r: "Correct! Communities living near protected areas often depend on bushmeat for food and income — creating direct conflict between subsistence needs and wildlife conservation.", w: "Bushmeat hunting is a socioeconomic conflict — local communities often have few alternatives, making enforcement-only conservation approaches unjust and ineffective." } },
+      { id: "coffee",          label: "Shade-grown vs. sun-grown coffee",   icon: "☕", correct: "socio",     fb: { r: "Right! Farmers clearing forest for sun-grown coffee get higher short-term yields — shade-grown coffee preserves bird habitat but requires economic incentives to compete.", w: "The shade vs. sun coffee conflict is socioeconomic — farmers face real income pressures that make deforestation economically rational without conservation incentives." } },
+      { id: "bald_eagle",      label: "Bald eagle recovery, USA",           icon: "🦅", correct: "success",   fb: { r: "Correct! The bald eagle was removed from the endangered species list in 2007 after rebounding from fewer than 500 nesting pairs in the 1960s to over 9,000 today — driven by DDT bans and ESA protection.", w: "Bald eagle recovery is a conservation success — pesticide regulation, legal protection and habitat preservation reversed a dramatic population collapse within decades." } },
+      { id: "humpback",        label: "Humpback whale rebound",             icon: "🐋", correct: "success",   fb: { r: "Right! Humpback whale populations have recovered from near-extinction to over 80,000 individuals following the global commercial whaling moratorium — one of conservation's greatest victories.", w: "Humpback whale recovery is a conservation success — the 1986 whaling moratorium allowed populations to rebound dramatically, demonstrating the power of international legal protection." } },
+    ]
+  }
+];
+
+let S = { round: 0, score: 0, correct: 0, total: 0, placed: {}, res: {}, fb: "", fbt: "", done: false };
+let drag = null;
+
+function R() { return ROUNDS[S.round]; }
+
+function pipHTML() {
+  return `<div class="progress">${ROUNDS.map((_, i) =>
+    `<div class="pip ${i < S.round ? 'done' : i === S.round ? 'active' : ''}"></div>`
+  ).join("")}<span style="font-size:11px;color:#6b6b68;margin-left:4px">${S.round + 1} of ${ROUNDS.length}</span></div>`;
+}
+
+function render() {
+  const el = document.getElementById("game");
+  if (S.done) { el.innerHTML = fin(); bindFin(); return; }
+  const r = R();
+  el.innerHTML = `
+    <div class="title">🌿 Habitat Loss &amp; Restoration</div>
+    <div class="sub">Sort real-world conservation scenarios into their correct category</div>
+    <div class="stats">
+      <div class="sc"><div class="sl">Score</div><div class="sv">${S.score}</div></div>
+      <div class="sc"><div class="sl">Correct</div><div class="sv">${S.correct}/${S.total}</div></div>
+      <div class="sc"><div class="sl">Round</div><div class="sv">${S.round + 1}/${ROUNDS.length}</div></div>
+    </div>
+    ${pipHTML()}
+    <div class="rl">${r.title}</div>
+    <div class="instr">${r.instr}</div>
+    <div class="pool-lbl">Drag these scenarios</div>
+    <div class="pool">${r.cards.map(c => `<div class="oc${S.placed[c.id] ? ' placed' : ''}" draggable="true" data-id="${c.id}">${c.icon} ${c.label}</div>`).join("")}</div>
+    <div class="zones">${r.zones.map(z => `
+      <div class="zone" data-zone="${z.id}">
+        <div class="zt">${z.label}<span class="badge">${z.badge}</span></div>
+        <div class="zh">${z.hint}</div>
+        <div class="zc">${r.cards.filter(c => S.placed[c.id] === z.id).map(c =>
+          `<span class="zcard ${S.res[c.id]}">${c.icon} ${c.label} ${S.res[c.id] === 'correct' ? '✓' : '✗'}</span>`
+        ).join("")}</div>
+      </div>`).join("")}
+    </div>
+    <div class="fb ${S.fbt}">${S.fb || "Drop a scenario into a category to begin."}</div>
+    ${r.cards.every(c => S.placed[c.id]) ? `<div style="text-align:right;margin-top:.25rem"><button class="btn btn-p" id="nb">${S.round < ROUNDS.length - 1 ? "Next round →" : "See results →"}</button></div>` : ""}
+  `;
+  bind(r);
+}
+
+function bind(r) {
+  document.querySelectorAll(".oc:not(.placed)").forEach(c => {
+    c.addEventListener("dragstart", e => { drag = e.currentTarget.dataset.id; setTimeout(() => e.currentTarget.classList.add("dragging"), 0); });
+    c.addEventListener("dragend", e => { e.currentTarget.classList.remove("dragging"); drag = null; });
+  });
+  document.querySelectorAll(".zone").forEach(z => {
+    z.addEventListener("dragover", e => { e.preventDefault(); z.classList.add("over"); });
+    z.addEventListener("dragleave", () => z.classList.remove("over"));
+    z.addEventListener("drop", e => {
+      e.preventDefault(); z.classList.remove("over");
+      if (!drag) return;
+      const card = r.cards.find(c => c.id === drag);
+      if (!card || S.placed[card.id]) return;
+      const zid = z.dataset.zone;
+      S.placed[card.id] = zid;
+      const ok = card.correct === zid;
+      S.res[card.id] = ok ? "correct" : "wrong";
+      S.total++;
+      if (ok) { S.correct++; S.score += 100; S.fb = "✓ " + card.fb.r; S.fbt = "ok"; }
+      else { S.score = Math.max(0, S.score - 20); S.fb = "✗ " + card.fb.w; S.fbt = "err"; }
+      drag = null; render();
+    });
+  });
+  const nb = document.getElementById("nb");
+  if (nb) nb.addEventListener("click", () => {
+    if (S.round < ROUNDS.length - 1) { S.round++; S.placed = {}; S.res = {}; S.fb = ""; S.fbt = ""; render(); }
+    else { S.done = true; render(); }
+  });
+}
+
+function fin() {
+  const pct = Math.round(S.correct / S.total * 100);
+  const g = pct >= 90 ? "Conservation expert! The planet needs more people like you." : pct >= 70 ? "Strong grasp of conservation — keep building on it." : pct >= 50 ? "Good effort — review the feedback to strengthen your knowledge." : "Keep studying — every habitat lost is worth fighting to understand.";
+  return `<div class="end">
+    <div class="ei">🌿</div>
+    <div class="et">Game complete!</div>
+    <div class="es">${g}</div>
+    <div class="ebig">${S.score}</div>
+    <div class="emeta">${S.correct} / ${S.total} correct &nbsp;·&nbsp; ${pct}% &nbsp;·&nbsp; ${ROUNDS.length} rounds</div>
+    <button class="btn btn-p" id="rb">Play again</button>
+  </div>`;
+}
+
+function bindFin() {
+  document.getElementById("rb").addEventListener("click", () => {
+    S = { round: 0, score: 0, correct: 0, total: 0, placed: {}, res: {}, fb: "", fbt: "", done: false };
+    render();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
