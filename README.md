@@ -1,6 +1,6 @@
 # ecosystem-project
 
-Here's Ecosystem Explorer! The game has 3 rounds:
+Here's Ecosystem Explorer! The game has 4 rounds:
 
 Sort by Biome — match organisms to their home ecosystem (rainforest, grassland, deep ocean). 
 Sort by Trophic Level — place species into the food chain (producer → primary → secondary consumer)
